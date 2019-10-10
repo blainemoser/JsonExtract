@@ -64,13 +64,10 @@ func jsonDecode(data string, wrapperType bool) (interface{}, error) {
 
 func getElemType(i interface{}) (jsonElem, error) {
 	switch v := i.(type) {
-	// case map with string key:
 	case map[string]interface{}:
 		return mapString(v), nil
-	// case slice of maps:
 	case []map[string]interface{}:
 		return mapSlice(v), nil
-	// case of a json array
 	case []interface{}:
 		return sliceString(v), nil
 	default:
@@ -127,9 +124,8 @@ func checkRoot(root interface{}) bool {
 func findInJSON(rawElem jsonElem, chain string) (interface{}, error) {
 	properties := splitProperties(chain)
 	var root interface{}
-	// var typeRoot interface{}
 	for _, v := range properties {
-		// Check whether v is an index reference:
+		// Check whether v is an index reference (eg "[5]"):
 		if isIndex(v) {
 			root = rawElem.extract(getIndex(v))
 		} else {
@@ -141,7 +137,7 @@ func findInJSON(rawElem jsonElem, chain string) (interface{}, error) {
 			return nil, errors.New(errorMsg)
 		}
 
-		// Type check root and repeat the process if not string
+		// Type check root and repeat the process if same it not string
 		if _, ok := root.(string); ok {
 			break
 		}
@@ -151,13 +147,13 @@ func findInJSON(rawElem jsonElem, chain string) (interface{}, error) {
 	return root, nil
 }
 
-// JSONExtract is created with a raw json string. It implements one function: Extract which extracts the property of the provided path
+// JSONExtract creates an instance of the package for a raw JSON (stored as RawJSON)
 type JSONExtract struct {
 	RawJSON string
 }
 
-// Extract pulls data from a JSON according to the path specified
-func (j *JSONExtract) Extract(chain string) (interface{}, error) {
+// Extract returns the value at the path specified or error
+func (j *JSONExtract) Extract(path string) (interface{}, error) {
 
 	wrapperType, err := wrapperType(j.RawJSON)
 	if err != nil {
@@ -174,7 +170,7 @@ func (j *JSONExtract) Extract(chain string) (interface{}, error) {
 		return nil, err
 	}
 
-	result, err := findInJSON(unwrapped, chain)
+	result, err := findInJSON(unwrapped, path)
 	if err != nil {
 		return nil, err
 	}
