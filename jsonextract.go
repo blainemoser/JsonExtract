@@ -1,8 +1,7 @@
-package main
+package jsonextract
 
 import (
 	"encoding/json"
-	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -122,41 +121,27 @@ func findInJSON(rawElem jsonElem, chain string) interface{} {
 	return root
 }
 
+// JSONExtract is created with a raw json string. It implements one function: Extract which extracts the property of the provided path
+type JSONExtract struct {
+	RawJSON string
+}
+
 // Extract pulls data from a JSON according to the path specified
-func Extract() interface{} {
+func (j *JSONExtract) Extract(chain string) (interface{}, error) {
 
-	here := `{
-		"blaine": "moser",
-		"steve": {
-			"james": [
-				"j", "k"
-			]
-		},
-		"other": [
-			"a", "b", "c"
-		]
-	}`
-
-	chain := "steve/james/[1]"
-
-	wrapperType, err := wrapperType(here)
+	wrapperType, err := wrapperType(j.RawJSON)
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
-	// fmt.Printf(here); os.Exit(3)
-	decoded, err := jsonDecode(here, wrapperType)
+
+	decoded, err := jsonDecode(j.RawJSON, wrapperType)
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
 	unwrapped, err := getElemType(decoded)
 	if err != nil { // note extract this
-		panic(err.Error())
+		return nil, err
 	}
 
-	return findInJSON(unwrapped, chain)
-
-}
-
-func main() {
-	fmt.Println(Extract())
+	return findInJSON(unwrapped, chain), nil
 }
