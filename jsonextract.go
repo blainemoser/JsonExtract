@@ -2,12 +2,11 @@ package jsonextract
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
-
-	// "os"
-	"errors"
 )
 
 type jsonElem interface {
@@ -17,22 +16,39 @@ type jsonElem interface {
 type mapSlice []map[string]interface{}
 
 func (m mapSlice) extract(key interface{}) interface{} {
-	i := key.(int)
-	return m[i]
+	if i, ok := key.(int); ok {
+		for j, _ := range m {
+			if i == j {
+				return m[i]
+			}
+		}
+	}
+	return false
 }
 
 type sliceString []interface{}
 
 func (m sliceString) extract(key interface{}) interface{} {
-	i := key.(int)
-	return m[i]
+	if i, ok := key.(int); ok {
+		if i > len(m)-1 {
+			return false
+		}
+		return m[i]
+	}
+	return false
 }
 
 type mapString map[string]interface{}
 
 func (m mapString) extract(key interface{}) interface{} {
-	i := key.(string)
-	return m[i]
+	if i, ok := key.(string); ok {
+		for j, _ := range m {
+			if i == j {
+				return m[i]
+			}
+		}
+	}
+	return false
 }
 
 func jsonDecode(data string, wrapperType bool) (interface{}, error) {
@@ -99,7 +115,16 @@ func splitProperties(chain string) []string {
 	return lines
 }
 
-func findInJSON(rawElem jsonElem, chain string) interface{} {
+func checkRoot(root interface{}) bool {
+	if root, ok := root.(bool); ok {
+		if !root {
+			return root
+		}
+	}
+	return true
+}
+
+func findInJSON(rawElem jsonElem, chain string) (interface{}, error) {
 	properties := splitProperties(chain)
 	var root interface{}
 	// var typeRoot interface{}
@@ -111,6 +136,11 @@ func findInJSON(rawElem jsonElem, chain string) interface{} {
 			root = rawElem.extract(v)
 		}
 
+		if !checkRoot(root) {
+			errorMsg := fmt.Sprintf("Specified path not found in JSON at: `.../%s`", v)
+			return nil, errors.New(errorMsg)
+		}
+
 		// Type check root and repeat the process if not string
 		if _, ok := root.(string); ok {
 			break
@@ -118,7 +148,7 @@ func findInJSON(rawElem jsonElem, chain string) interface{} {
 
 		rawElem, _ = getElemType(root)
 	}
-	return root
+	return root, nil
 }
 
 // JSONExtract is created with a raw json string. It implements one function: Extract which extracts the property of the provided path
@@ -138,10 +168,15 @@ func (j *JSONExtract) Extract(chain string) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	unwrapped, err := getElemType(decoded)
-	if err != nil { // note extract this
+	if err != nil {
 		return nil, err
 	}
 
-	return findInJSON(unwrapped, chain), nil
+	result, err := findInJSON(unwrapped, chain)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
