@@ -133,7 +133,7 @@ func findInJSON(rawElem jsonElem, chain string) (interface{}, error) {
 		}
 
 		if !checkRoot(root) {
-			errorMsg := fmt.Sprintf("Specified path not found in JSON at: `.../%s`", v)
+			errorMsg := fmt.Sprintf("path `.../%s` not found in JSON", v)
 			return nil, errors.New(errorMsg)
 		}
 
