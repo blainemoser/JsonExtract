@@ -1,5 +1,5 @@
 # JsonExtract
-## A package for Go that allows users to extract the properties of a raw JSON object
+## A package for Go for extracting the properties of a raw JSON object
 ### Details
 The function `jsonextract.JSONExtract.Extract` decodes a raw JSON object and returns the property at the specified path (if same exists).
 
