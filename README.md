@@ -1,5 +1,5 @@
 # JsonExtract
-## A package for Go for extracting the properties of a raw JSON object
+## A package for Go for extracting a JSON's properties
 ### Details
 The function `jsonextract.JSONExtract.Extract` decodes a raw JSON object and returns the property at the specified path (if same exists).
 
@@ -31,7 +31,7 @@ import (
 
 func main() {
 
-  // Example of a raw JSON object
+  	// Example of a raw JSON object
 	jsonText := `{
 		"prop1": "prop1_text",
 		"prop2": {
