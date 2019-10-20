@@ -9,7 +9,7 @@ To use this function, create an instance of the struct `JSONExtract`, with the p
 Retrieve a property:
 `property, err := json.Extract("path/to/property")`
 
-The path of the property must be separated by forward-slashes (`/`).
+The path to the property must be separated by forward-slashes (`/`).
 
 For list indexes, indicate the element position by enclosing the index in square brackets, e.g. `"path/to/list/[0]"`.
 
