@@ -15,6 +15,10 @@ type jsonElem interface {
 
 type mapSlice []map[string]interface{}
 
+type sliceString []interface{}
+
+type mapString map[string]interface{}
+
 func (m mapSlice) extract(key interface{}) interface{} {
 	if i, ok := key.(int); ok {
 		for j, _ := range m {
@@ -26,8 +30,6 @@ func (m mapSlice) extract(key interface{}) interface{} {
 	return false
 }
 
-type sliceString []interface{}
-
 func (m sliceString) extract(key interface{}) interface{} {
 	if i, ok := key.(int); ok {
 		if i > len(m)-1 {
@@ -37,8 +39,6 @@ func (m sliceString) extract(key interface{}) interface{} {
 	}
 	return false
 }
-
-type mapString map[string]interface{}
 
 func (m mapString) extract(key interface{}) interface{} {
 	if i, ok := key.(string); ok {
