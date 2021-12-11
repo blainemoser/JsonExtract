@@ -75,8 +75,10 @@ func getElemType(i interface{}) (jsonElem, error) {
 	}
 }
 
-func wrapperType(json string) (bool, error) {
-	wrapper := string(json[0]) + string(json[len(json)-1])
+func (j *JSONExtract) wrapperType() (bool, error) {
+	j.RawJSON = strings.Trim(j.RawJSON, "\n")
+	j.RawJSON = strings.Trim(j.RawJSON, " ")
+	wrapper := string(j.RawJSON[0]) + string(j.RawJSON[len(j.RawJSON)-1])
 	switch wrapper {
 	case "{}":
 		return true, nil
@@ -155,7 +157,7 @@ type JSONExtract struct {
 // Extract returns the value at the path specified or error
 func (j *JSONExtract) Extract(path string) (interface{}, error) {
 
-	wrapperType, err := wrapperType(j.RawJSON)
+	wrapperType, err := j.wrapperType()
 	if err != nil {
 		return nil, err
 	}

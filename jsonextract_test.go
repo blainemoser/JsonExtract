@@ -17,7 +17,7 @@ func checkType(prop interface{}, extracted string, expect reflect.Kind, t *testi
 // General test
 func TestGeneral(t *testing.T) {
 
-	json := &JSONExtract{RawJSON: `[{"blainemoser": "here", "list": ["1", "3", "34"]}]`}
+	json := &JSONExtract{RawJSON: ` [{"blainemoser": "here", "list": ["1", "3", "34"]}]  `}
 
 	extracted := "[0]/list/[2]"
 	prop, err := json.Extract(extracted)
