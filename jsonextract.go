@@ -27,7 +27,7 @@ func (m mapSlice) extract(key interface{}) interface{} {
 			}
 		}
 	}
-	return false
+	return nil
 }
 
 func (m sliceString) extract(key interface{}) interface{} {
@@ -37,7 +37,7 @@ func (m sliceString) extract(key interface{}) interface{} {
 		}
 		return m[i]
 	}
-	return false
+	return nil
 }
 
 func (m mapString) extract(key interface{}) interface{} {
@@ -48,7 +48,7 @@ func (m mapString) extract(key interface{}) interface{} {
 			}
 		}
 	}
-	return false
+	return nil
 }
 
 func jsonDecode(data string, wrapperType bool) (interface{}, error) {
@@ -114,15 +114,6 @@ func splitProperties(chain string) []string {
 	return lines
 }
 
-func checkRoot(root interface{}) bool {
-	if root, ok := root.(bool); ok {
-		if !root {
-			return root
-		}
-	}
-	return true
-}
-
 func findInJSON(rawElem jsonElem, chain string) (interface{}, error) {
 	properties := splitProperties(chain)
 	var root interface{}
@@ -134,7 +125,7 @@ func findInJSON(rawElem jsonElem, chain string) (interface{}, error) {
 			root = rawElem.extract(v)
 		}
 
-		if !checkRoot(root) {
+		if root == nil {
 			errorMsg := fmt.Sprintf("path `.../%s` not found in JSON", v)
 			return nil, errors.New(errorMsg)
 		}
